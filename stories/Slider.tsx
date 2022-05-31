@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 import './slider.css';
 
 interface SliderProps {
@@ -26,11 +26,32 @@ const Slider = ({
 }: SliderProps): JSX.Element => {
     const activeWidth: string = `${(current / max) * 100}%`;
 
+    const onMouseDown = (e: MouseEvent): void => {
+        console.log('mouse down');
+    };
+
+    const onTouchStart = (e: TouchEvent): void => {
+        console.log('touch start');
+    };
+
+    const onKeyDown = (e: KeyboardEvent): void => {
+        console.log('key down');
+    };
+
     return (
         <div className={`ReactSlider`}>
             <div className={`ReactSlider__slider`}>
-                <div className={`ReactSlider__active`} style={{ width: activeWidth }}>
-                    <button className={`ReactSlider__handle`}></button>
+                <div
+                    className={`ReactSlider__active`}
+                    style={{ width: activeWidth }}
+                >
+                    <button
+                        type="button"
+                        className={`ReactSlider__handle`}
+                        onMouseDown={onMouseDown}
+                        onTouchStart={onTouchStart}
+                        onKeyDown={onKeyDown}
+                    />
                 </div>
             </div>
         </div>
