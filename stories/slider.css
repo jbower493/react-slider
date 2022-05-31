@@ -1,0 +1,37 @@
+:root {
+    --background--red-secondary: #ffdbdb;
+    --background--red-primary: #ff1f1f;
+    --background--white: #ffffff;
+    --border-radius--slider: 40px;
+    --border--handle: 1px solid #404040;
+}
+
+.ReactSlider {
+    width: 300px;
+}
+
+.ReactSlider__slider {
+    height: 10px;
+    border-radius: 40px;
+    background-color: var(--background--red-secondary);
+}
+
+.ReactSlider__active {
+    height: 100%;
+    border-radius: var(--border-radius--slider);
+    background-color: var(--background--red-primary);
+    position: relative;
+}
+
+.ReactSlider__handle {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+    background-color: var(--background--white);
+    border: var(--border--handle);
+    cursor: pointer;
+}
