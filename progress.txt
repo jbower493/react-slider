@@ -1,0 +1,4 @@
+Current issues:
+
+- Doesnt increase past 1 short of max
+- Doesnt decrease past 2 short of min
