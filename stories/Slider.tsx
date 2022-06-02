@@ -51,22 +51,37 @@ const Slider = ({
 
         if (mouseX === undefined || sliderMinX === undefined || sliderMaxX === undefined) return;
 
-        const possibleValues: { value: number; x: number; }[] = [];
+        type PossibleValue = {
+            value: number;
+            x: {
+                start: number;
+                end: number;
+            };
+        }
+
+        const possibleValues: PossibleValue[] = [];
         const numOfValues: number = ((max - min) / step);
         const widthOfOneSegment: number = (sliderMaxX - sliderMinX) / numOfValues;
-
+console.log(widthOfOneSegment)
         let j: number = 1;
         for (let i: number = min; i <= max; i += step) {
-            const xValue: number = widthOfOneSegment * j;
-            possibleValues.push({ value: i, x: xValue });
+            const xValue: number = sliderMinX + (widthOfOneSegment * (j - 1));
+            possibleValues.push({
+                value: i,
+                x: {
+                    start: xValue - (widthOfOneSegment / 2),
+                    end: xValue + (widthOfOneSegment / 2)
+                }
+            });
             j++;
         }
 
         // Exit if its trying to increase beyond the max or decrease beyond the min
         if (mouseX > sliderMaxX || mouseX < sliderMinX) return;
         
-        const newValueObj: { value: number; x: number; } | undefined = possibleValues.find((valueObj: { value: number; x: number; }, index: number) => mouseX >= valueObj.x && mouseX < possibleValues[index + 1].x);
-
+        const newValueObj: PossibleValue | undefined = possibleValues.find((valueObj: PossibleValue) => mouseX >= valueObj.x.start && mouseX < valueObj.x.end);
+console.log(newValueObj?.x)
+console.log(mouseX)
         if (typeof newValueObj?.value === 'number' && newValueObj.value !== current) onSliderChange(newValueObj.value);
     };
 

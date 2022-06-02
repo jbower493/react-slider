@@ -1,4 +1,3 @@
 Current issues:
 
-- Doesnt increase past 1 short of max
-- Doesnt decrease past 2 short of min
+- There are slight overlaps in the zones because of the decimals, find a better way to calculate the x values of each node.
