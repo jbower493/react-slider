@@ -5,7 +5,7 @@ interface Props {
 };
 
 const SliderLogicContainer = ({ children }: Props): JSX.Element => {
-    const [current, setCurrent] = useState<number>(1);
+    const [current, setCurrent] = useState<number>(2);
 
     const onSliderChange = (newValue: number) => {
         setCurrent(newValue);

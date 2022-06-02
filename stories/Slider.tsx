@@ -1,5 +1,6 @@
 import React, {
     useRef,
+    useMemo,
     KeyboardEvent,
     MouseEvent,
     TouchEvent,
@@ -30,10 +31,24 @@ const Slider = ({
     step,
     onSliderChange
 }: SliderProps): JSX.Element => {
+
+    // Constants
     const sliderRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
 
-    const activeWidth: string = `${(current / max) * 100}%`;
+    const values: number[] = useMemo(() => {
+        return Array(((max - min) / step) + 1)
+            .fill(1)
+            .map((item: number, index) => min + (index * step));
+    }, []);
 
+    const getActiveWidth = (): string => {
+        if (current === min) return '0%';
+        if (current === max) return '100%';
+
+        return `${(((current - step) / (values.length - 1))) * 100}%`;
+    };
+
+    // Functions
     const incrementSlider = (): void => {
         if (current < max) onSliderChange(current + step);
     };
@@ -50,39 +65,9 @@ const Slider = ({
         const sliderMaxX: number | undefined = sliderRect?.right;
 
         if (mouseX === undefined || sliderMinX === undefined || sliderMaxX === undefined) return;
-
-        type PossibleValue = {
-            value: number;
-            x: {
-                start: number;
-                end: number;
-            };
-        }
-
-        const possibleValues: PossibleValue[] = [];
-        const numOfValues: number = ((max - min) / step);
-        const widthOfOneSegment: number = (sliderMaxX - sliderMinX) / numOfValues;
-console.log(widthOfOneSegment)
-        let j: number = 1;
-        for (let i: number = min; i <= max; i += step) {
-            const xValue: number = sliderMinX + (widthOfOneSegment * (j - 1));
-            possibleValues.push({
-                value: i,
-                x: {
-                    start: xValue - (widthOfOneSegment / 2),
-                    end: xValue + (widthOfOneSegment / 2)
-                }
-            });
-            j++;
-        }
-
-        // Exit if its trying to increase beyond the max or decrease beyond the min
-        if (mouseX > sliderMaxX || mouseX < sliderMinX) return;
         
-        const newValueObj: PossibleValue | undefined = possibleValues.find((valueObj: PossibleValue) => mouseX >= valueObj.x.start && mouseX < valueObj.x.end);
-console.log(newValueObj?.x)
-console.log(mouseX)
-        if (typeof newValueObj?.value === 'number' && newValueObj.value !== current) onSliderChange(newValueObj.value);
+        
+       
     };
 
     const handleTouchMove = (e: TouchEventInit): void => {
@@ -117,9 +102,14 @@ console.log(mouseX)
                 ref={sliderRef}
                 className={`ReactSlider__slider`}
             >
+                <div className={`ReactSlider__nodeContainer`}>
+                    {values.map((value, index) => (
+                        <div className={`ReactSlider__node${index <= values.indexOf(current) ? ' ReactSlider__node--active' : ''}`} />
+                    ))}
+                </div>
                 <div
                     className={`ReactSlider__active`}
-                    style={{ width: activeWidth }}
+                    style={{ width: getActiveWidth() }}
                 >
                     <button
                         type="button"

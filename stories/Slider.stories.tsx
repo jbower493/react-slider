@@ -26,7 +26,7 @@ const Template: ComponentStory<typeof Slider> = (args) => (
 export const Primary = Template.bind({});
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 Primary.args = {
-    max: 10,
+    max: 5,
     min: 1,
     step: 1
 };
