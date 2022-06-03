@@ -4,7 +4,8 @@ import React, {
     KeyboardEvent,
     MouseEvent,
     TouchEvent,
-    RefObject
+    RefObject,
+    useEffect
 } from 'react';
 import './slider.css';
 
@@ -34,6 +35,7 @@ const Slider = ({
 
     // Constants
     const sliderRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
+    const nodeContainerRef: RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
 
     const values: number[] = useMemo(() => {
         return Array(((max - min) / step) + 1)
@@ -49,51 +51,59 @@ const Slider = ({
     };
 
     // Functions
-    const incrementSlider = (): void => {
-        if (current < max) onSliderChange(current + step);
+    const updateSlider = (newValue: number | undefined): void => {
+        if (typeof newValue === 'number' && newValue <= max && newValue >= min) onSliderChange(newValue);
     };
 
-    const decrementSlider = (): void => {
-        if (current > min) onSliderChange(current - step);
-    };
-
-    const handleMouseMove = (e: MouseEventInit): void => {
+    const handlePointerMove = (e: MouseEventInit): void => {
         const mouseX: number | undefined = e.clientX;
 
         const sliderRect: DOMRect | undefined = sliderRef.current?.getBoundingClientRect();
         const sliderMinX: number | undefined = sliderRect?.left;
         const sliderMaxX: number | undefined = sliderRect?.right;
 
-        if (mouseX === undefined || sliderMinX === undefined || sliderMaxX === undefined) return;
+        if (mouseX === undefined || sliderMinX === undefined || sliderMaxX === undefined || !nodeContainerRef.current) return;
         
+        const nodes: Element[] = Array.from(nodeContainerRef.current.children);
+        const getCorrectNodeIndex = (): number => {
+            if ( mouseX > sliderMaxX) return nodes.length - 1;
+            if ( mouseX < sliderMinX) return 0;
+
+            return nodes.findIndex((node: Element, index: number) => {
+                const { left, right } = node.getBoundingClientRect();
+                return mouseX >= left && mouseX < right;
+            })
+        }
+
+        const newValue: number | undefined = values.find((value: number, index: number) => index === getCorrectNodeIndex());
         
-       
+        updateSlider(newValue);
     };
 
-    const handleTouchMove = (e: TouchEventInit): void => {
-        
-    };
-
-    const onMouseDown = (e: MouseEvent): void => {
-        const onMouseUp = (e: MouseEventInit): void => {
-            document.removeEventListener('mousemove', handleMouseMove);
+    const onPointerDown = (e: MouseEvent): void => {
+        const onPointerUp = (e: MouseEventInit): void => {
+            document.removeEventListener('pointermove', handlePointerMove);
         };
 
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', onMouseUp, { once: true });
-    };
-
-    const onTouchStart = (e: TouchEvent): void => {
-        const onTouchEnd = (e: TouchEventInit): void => {
-            document.removeEventListener('touchend', handleTouchMove);
-        };
-
-        document.addEventListener('touchmove', handleTouchMove);
-        document.addEventListener('touchend', onTouchEnd, { once: true });
+        document.addEventListener('pointermove', handlePointerMove);
+        document.addEventListener('pointerup', onPointerUp, { once: true });
     };
 
     const onKeyDown = (e: KeyboardEvent): void => {
-        
+        switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+                e.preventDefault();
+                updateSlider(current + step);
+                break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+                e.preventDefault();
+                updateSlider(current - step);
+                break;
+            default:
+                break;
+        }
     };
 
     return (
@@ -102,9 +112,15 @@ const Slider = ({
                 ref={sliderRef}
                 className={`ReactSlider__slider`}
             >
-                <div className={`ReactSlider__nodeContainer`}>
+                <div
+                    ref={nodeContainerRef}
+                    className={`ReactSlider__nodeContainer`}
+                >
                     {values.map((value, index) => (
-                        <div className={`ReactSlider__node${index <= values.indexOf(current) ? ' ReactSlider__node--active' : ''}`} />
+                        <div
+                            key={index}
+                            className={`ReactSlider__node${index <= values.indexOf(current) ? ' ReactSlider__node--active' : ''}`}
+                        />
                     ))}
                 </div>
                 <div
@@ -114,8 +130,7 @@ const Slider = ({
                     <button
                         type="button"
                         className={`ReactSlider__handle`}
-                        onMouseDown={onMouseDown}
-                        onTouchStart={onTouchStart}
+                        onPointerDown={onPointerDown}
                         onKeyDown={onKeyDown}
                     />
                 </div>
