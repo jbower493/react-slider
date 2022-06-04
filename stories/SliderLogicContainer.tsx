@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface Props {
     children: (curent: number, onSliderChange: (newValue: number) => void) => JSX.Element

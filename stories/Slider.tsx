@@ -2,10 +2,8 @@ import React, {
     useRef,
     useMemo,
     KeyboardEvent,
-    MouseEvent,
-    TouchEvent,
-    RefObject,
-    useEffect
+    PointerEvent,
+    RefObject
 } from 'react';
 import './slider.css';
 
@@ -55,7 +53,7 @@ const Slider = ({
         if (typeof newValue === 'number' && newValue <= max && newValue >= min) onSliderChange(newValue);
     };
 
-    const handlePointerMove = (e: MouseEventInit): void => {
+    const handlePointerMove = (e: PointerEventInit): void => {
         const mouseX: number | undefined = e.clientX;
 
         const sliderRect: DOMRect | undefined = sliderRef.current?.getBoundingClientRect();
@@ -80,8 +78,8 @@ const Slider = ({
         updateSlider(newValue);
     };
 
-    const onPointerDown = (e: MouseEvent): void => {
-        const onPointerUp = (e: MouseEventInit): void => {
+    const onPointerDown = (e: PointerEvent): void => {
+        const onPointerUp = (e: PointerEventInit): void => {
             document.removeEventListener('pointermove', handlePointerMove);
         };
 
