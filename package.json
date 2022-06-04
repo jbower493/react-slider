@@ -1,7 +1,7 @@
 {
     "name": "react-slider",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "build/main.js",
     "license": "MIT",
     "devDependencies": {
         "@babel/cli": "^7.17.10",
