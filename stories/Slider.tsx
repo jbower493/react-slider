@@ -2,8 +2,9 @@ import React, {
     useRef,
     useMemo,
     KeyboardEvent,
-    PointerEvent,
-    RefObject
+    MouseEvent,
+    TouchEvent,
+    RefObject,
 } from 'react';
 import './slider.css';
 
@@ -53,7 +54,7 @@ const Slider = ({
         if (typeof newValue === 'number' && newValue <= max && newValue >= min) onSliderChange(newValue);
     };
 
-    const handlePointerMove = (e: PointerEventInit): void => {
+    const handleMouseMove = (e: MouseEventInit): void => {
         const mouseX: number | undefined = e.clientX;
 
         const sliderRect: DOMRect | undefined = sliderRef.current?.getBoundingClientRect();
@@ -78,13 +79,49 @@ const Slider = ({
         updateSlider(newValue);
     };
 
-    const onPointerDown = (e: PointerEvent): void => {
-        const onPointerUp = (e: PointerEventInit): void => {
-            document.removeEventListener('pointermove', handlePointerMove);
+    const handleTouchMove = (e: TouchEventInit): void => {
+        
+
+        const touchX: number | undefined = e.touches ? e.touches[0].clientX : undefined;
+
+        const sliderRect: DOMRect | undefined = sliderRef.current?.getBoundingClientRect();
+        const sliderMinX: number | undefined = sliderRect?.left;
+        const sliderMaxX: number | undefined = sliderRect?.right;
+
+        if (touchX === undefined || sliderMinX === undefined || sliderMaxX === undefined || !nodeContainerRef.current) return;
+        
+        const nodes: Element[] = Array.from(nodeContainerRef.current.children);
+        const getCorrectNodeIndex = (): number => {
+            if ( touchX > sliderMaxX) return nodes.length - 1;
+            if ( touchX < sliderMinX) return 0;
+
+            return nodes.findIndex((node: Element, index: number) => {
+                const { left, right } = node.getBoundingClientRect();
+                return touchX >= left && touchX < right;
+            })
+        }
+
+        const newValue: number | undefined = values.find((value: number, index: number) => index === getCorrectNodeIndex());
+        
+        updateSlider(newValue);
+    };
+
+    const onMouseDown = (e: MouseEvent): void => {
+        const onMouseUp = (e: MouseEventInit): void => {
+            document.removeEventListener('mousemove', handleMouseMove);
         };
 
-        document.addEventListener('pointermove', handlePointerMove);
-        document.addEventListener('pointerup', onPointerUp, { once: true });
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', onMouseUp, { once: true });
+    };
+
+    const onTouchStart = (e: TouchEvent): void => {
+        const onTouchEnd = (e: TouchEventInit): void => {
+            document.removeEventListener('touchmove', handleTouchMove);
+        };
+
+        document.addEventListener('touchmove', e => handleTouchMove);
+        document.addEventListener('touchend', onTouchEnd, { once: true });
     };
 
     const onKeyDown = (e: KeyboardEvent): void => {
@@ -128,7 +165,8 @@ const Slider = ({
                     <button
                         type="button"
                         className={`ReactSlider__handle`}
-                        onPointerDown={onPointerDown}
+                        onMouseDown={onMouseDown}
+                        onTouchStart={onTouchStart}
                         onKeyDown={onKeyDown}
                     />
                 </div>
