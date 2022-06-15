@@ -79,8 +79,9 @@ const Slider = ({
         updateSlider(newValue);
     };
 
-    const handleTouchMove = (e: TouchEventInit): void => {
-        
+    const onTouchMove = (e: TouchEvent): void => {
+        e.preventDefault();
+        e.stopPropagation();
 
         const touchX: number | undefined = e.touches ? e.touches[0].clientX : undefined;
 
@@ -113,15 +114,6 @@ const Slider = ({
 
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', onMouseUp, { once: true });
-    };
-
-    const onTouchStart = (e: TouchEvent): void => {
-        const onTouchEnd = (e: TouchEventInit): void => {
-            document.removeEventListener('touchmove', handleTouchMove);
-        };
-
-        document.addEventListener('touchmove', e => handleTouchMove);
-        document.addEventListener('touchend', onTouchEnd, { once: true });
     };
 
     const onKeyDown = (e: KeyboardEvent): void => {
@@ -166,7 +158,7 @@ const Slider = ({
                         type="button"
                         className={`ReactSlider__handle`}
                         onMouseDown={onMouseDown}
-                        onTouchStart={onTouchStart}
+                        onTouchMove={onTouchMove}
                         onKeyDown={onKeyDown}
                     />
                 </div>
