@@ -5,18 +5,22 @@ module.exports = {
     entry: path.resolve(__dirname, 'src', 'index.js'),
     output: {
         path: path.resolve(__dirname, 'build'),
-        filename: 'main.js'
+        filename: 'main.js',
+        library: {
+            name: 'react-slider',
+            type: 'umd'
+        }
     },
     resolve: {
-        extensions: ['.ts', '.tsx', '.js']
+        extensions: ['.ts', '.tsx']
     },
     module: {
         rules: [
-            {
-                test: /\.(js|jsx)$/,
-                use: 'babel-loader',
-                exclude: /node_modules/
-            },
+            // {
+            //     test: /\.(js|jsx)$/,
+            //     use: 'babel-loader',
+            //     exclude: /node_modules/
+            // },
             {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
@@ -27,5 +31,8 @@ module.exports = {
                 use: ['style-loader', 'css-loader']
             }
         ]
+    },
+    externals: {
+        react: 'react'
     }
 };
